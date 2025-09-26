@@ -32,18 +32,19 @@ for month_dir in month_dirs:
             except Exception as e:
                 print(f"Ошибка при чтении {file_path}: {e}")
 
-# Объединение по типу файла
+output_dir = "combined_output"
+os.makedirs(output_dir, exist_ok=True)
+
+# Объединение и сохранение по типу файла
 final_combined = {}
 for file, dfs in combined_data.items():
     if dfs:
-        final_combined[file] = pd.concat(dfs, ignore_index=True)
-        print(f"\n===== {file} ({len(final_combined[file])} строк) =====")
-        print(final_combined[file].head())
+        combined_df = pd.concat(dfs, ignore_index=True)
+        final_combined[file] = combined_df
+
+        # Сохраняем в отдельный CSV
+        out_path = os.path.join(output_dir, f"combined_{file}")
+        combined_df.to_csv(out_path, index=False)
+        print(f"Сохранено: {out_path} ({len(combined_df)} строк)")
     else:
         print(f"\nНет данных для {file}")
-
-# Теперь у тебя есть:
-# final_combined['mining_by_region.csv']
-# final_combined['moon_materials_by_region.csv']
-# final_combined['regional_stats.csv']
-# final_combined['kill_dump.csv']
